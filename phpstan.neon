@@ -1,0 +1,9 @@
+includes:
+    - ./vendor/nunomaduro/larastan/extension.neon
+parameters:
+    level: 2
+    paths:
+        - app
+    ignoreErrors:
+        - '#Call to an undefined method \$this\(App\\Http\\Controllers\\Auth\\LoginController\)::fireLockoutEvent\(\).#'
+        - '#Call to an undefined method \$this\(App\\Http\\Controllers\\Auth\\LoginController\)::sendLockoutResponse\(\).#'

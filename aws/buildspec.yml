@@ -1,0 +1,66 @@
+version: 0.2
+
+env:
+  secrets-manager:
+    DB_PASSWORD: SECRET_MANAGER:DB_PASSWORD
+    AWS_ACCESS_KEY_ID: SECRET_MANAGER:AWS_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY: SECRET_MANAGER:AWS_SECRET_ACCESS_KEY
+    DOCKER_HUB_USER: SECRET_MANAGER:DOCKER_HUB_USER
+    DOCKER_HUB_PASS: SECRET_MANAGER:DOCKER_HUB_PASS
+    SECRET_MANAGER: SECRET_MANAGER:SECRET_MANAGER
+
+phases:
+  install:
+    runtime-versions:
+      docker: 18
+      nodejs: 12.x
+
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws --version
+      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query 'Account' --output text)
+      - IMAGE_NAME_APP=app
+      - IMAGE_NAME_WEB=web
+      - REPOSITORY_URI_APP=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${PROJECT_NAMESPACE}/${IMAGE_NAME_APP}
+      #- echo ${REPOSITORY_URI_APP}
+      - REPOSITORY_URI_WEB=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${PROJECT_NAMESPACE}/${IMAGE_NAME_WEB}
+      #- echo ${REPOSITORY_URI_WEB}
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+
+  build:
+    commands:
+      - cp .env.example .env
+      - docker login -u ${DOCKER_HUB_USER} -p ${DOCKER_HUB_PASS}
+      - sed -i -e 's/DB_MASTER_HOST=db/DB_MASTER_HOST='${DB_MASTER_HOST}'/' ./.env
+      - sed -i -e 's/DB_SLAVE_HOST=db/DB_SLAVE_HOST='${DB_SLAVE_HOST}'/' ./.env
+      - sed -i -e 's/DB_USERNAME=root/DB_USERNAME='${DB_USERNAME}'/' ./.env
+      - sed -i -e 's/DB_PASSWORD=root/'DB_PASSWORD=${DB_PASSWORD}'/' ./.env
+      - sed -i -e 's/AWS_ACCESS_KEY_ID=/'AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}'/' ./.env
+      - sed -i -e 's/AWS_SECRET_ACCESS_KEY=/'AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}'/' ./.env
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - npm i && npm run prod
+      - docker build --build-arg TZ=Asia/Tokyo -t ${REPOSITORY_URI_APP}:latest -f docker/php/Dockerfile .
+      - docker build -t ${REPOSITORY_URI_WEB}:latest -f docker/nginx/Dockerfile .
+      - docker tag ${REPOSITORY_URI_APP}:latest ${REPOSITORY_URI_APP}:$IMAGE_TAG
+      - docker tag ${REPOSITORY_URI_WEB}:latest ${REPOSITORY_URI_WEB}:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker images...
+      - docker push ${REPOSITORY_URI_APP}:latest
+      - docker push ${REPOSITORY_URI_APP}:$IMAGE_TAG
+      - docker push ${REPOSITORY_URI_WEB}:latest
+      - docker push ${REPOSITORY_URI_WEB}:$IMAGE_TAG
+      - echo Writing image definitions file...
+      - cat aws/${ENVIRONMENT}/appspec.yaml > appspec.yaml
+      - cat aws/${ENVIRONMENT}/taskdef-template.json | sed -e s@\<IMAGE_NAME_WEB\>@$REPOSITORY_URI_WEB:$IMAGE_TAG@ -e s@\<IMAGE_NAME_APP\>@$REPOSITORY_URI_APP:$IMAGE_TAG@ -e s@\<SECRET_MANAGER\>@$SECRET_MANAGER@ > taskdef.json
+
+artifacts:
+  files:
+    - appspec.yaml
+    - taskdef.json
