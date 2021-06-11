@@ -15,12 +15,12 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id')->comment('id');
-            $table->string('user_id')->unique('UNQ_USER_ID')->comment('ユーザーID');
+            $table->string('mail_address')->unique('UNQ_MAIL_ADDRESS')->comment('メールアドレス');
             $table->string('password')->comment('パスワード');
-            $table->string('access_token')->comment('アクセストークン');
-            $table->string('name')->comment('名前');
-            $table->string('del_flg')->comment('削除フラグ');
-            $table->timestamps();
+            $table->string('user_name')->comment('名前');
+            $table->boolean('status')->unsigned()->default(1)->comment('削除フラグ');
+            $table->boolean('role')->unsigned()->default(0)->comment('役職');
+            $table->dateTimes();
         });
     }
 

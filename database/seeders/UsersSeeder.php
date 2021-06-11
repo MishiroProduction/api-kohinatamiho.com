@@ -1,0 +1,28 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+
+class UsersSeeder extends Seeder
+{
+    /**
+     * Run the database seeders.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        DB::table('users')->insert([
+            'mail_address' => 'takada_yuki@kohinatamiho.com',
+            'password' => Hash::make('hogehoge'),
+            'user_name' => '高田憂希',
+            'status' => 1,
+            'role' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+}

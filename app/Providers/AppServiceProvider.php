@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Schema\Blueprint;
 use App\Services\Interfaces;
 use App\Services;
 
@@ -35,6 +36,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->macros();
+    }
+
+    /**
+     * Register macros which will be used in application
+     */
+    protected function macros()
+    {
+        Blueprint::macro('dateTimes', function ($precision = 0) {
+            $this->dateTime('created_at', $precision)->nullable()->comment('作成日時');
+            $this->dateTime('updated_at', $precision)->nullable()->comment('更新日時');
+        });
     }
 }
