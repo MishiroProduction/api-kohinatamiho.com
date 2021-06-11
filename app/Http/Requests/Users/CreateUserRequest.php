@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\AdminUsers;
+namespace App\Http\Requests\Users;
 
-use App\Models\AdminUser;
+use App\Models\User;
 use App\Http\Requests\Request as AppRequest;
 
-class CreateAdminUserRequest extends AppRequest
+class CreateUserRequest extends AppRequest
 {
     /**
      * Determine if the user is authorizpassword_confirmed to make this request.
@@ -16,7 +16,7 @@ class CreateAdminUserRequest extends AppRequest
      */
     public function authorize(): bool
     {
-        return me() && me()->can('create', AdminUser::class);
+        return me() && me()->can('create', User::class);
     }
 
     /**
@@ -32,7 +32,7 @@ class CreateAdminUserRequest extends AppRequest
             'password_confirm' => 'required|same:password',
             'name' => 'required',
             'role' => 'required|int',
-            'status' => 'required|int'
+            'status' => 'required|int',
         ];
     }
 
@@ -64,7 +64,7 @@ class CreateAdminUserRequest extends AppRequest
             'password_confirm' => 'パスワード(確認)',
             'name' => '名前',
             'role' => 'ロール',
-            'status' => 'ステータス'
+            'status' => 'ステータス',
         ];
     }
 }
