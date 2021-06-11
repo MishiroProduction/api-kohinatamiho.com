@@ -20,6 +20,6 @@ class Controller extends BaseController
      */
     public function __construct()
     {
-        $this->middleware(['auth:api', 'accessible']);
+        $this->middleware(['auth:api']);
     }
 }

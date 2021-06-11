@@ -41,7 +41,7 @@ return [
             'provider' => 'admin_users',
         ],
 
-        'user' => [
+        'api' => [
             'driver' => 'jwt',
             'provider' => 'users',
         ],
@@ -88,7 +88,7 @@ return [
 
     'passwords' => [
         'users' => [
-            'provider' => 'users',
+            'provider' => 'api',
             'table' => 'password_resets',
             'expire' => 60,
         ],

@@ -9,8 +9,8 @@ if (! function_exists('me')) {
      */
     function me($key = null)
     {
-        if (\Auth::guard('web')->check()) {
-            return $key ? \Auth::guard('web')->user()->getAttribute($key) : \Auth::guard('web')->user();
+        if (\Auth::guard('api')->check()) {
+            return $key ? \Auth::guard('api')->user()->getAttribute($key) : \Auth::guard('api')->user();
         }
 
         return null;
