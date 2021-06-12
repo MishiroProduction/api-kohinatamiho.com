@@ -29,8 +29,6 @@ class UserService extends AppService implements UserServiceInterface
         }
         return [
             'status' => true,
-            'errors' => null,
-            'message' => '',
             'data' => $members,
         ];
     }
@@ -45,7 +43,7 @@ class UserService extends AppService implements UserServiceInterface
             return [
                 'status' => false,
                 'errors' => [
-                    'key' => 'unauthorized',
+                    'key' => 'login_failure',
                 ],
             ];
         }

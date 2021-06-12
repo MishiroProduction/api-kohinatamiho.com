@@ -22,14 +22,37 @@ class UserController extends AppController
     {
         $response = $this->userService->index($request);
         if (!$response['status']) {
-            return response()->json([], 404);
+            if (!empty($response['errors'])) {
+                $error = apiErrorResponse($response['errors']['key']);
+                return response()->json($error['body'], $error['response_code']);
+            }
+            $error = apiErrorResponse('internal_server_error');
+            return response()->json($error['body'], $error['response_code']);
         }
-        return response()->json($response['data'], 200);
+        return response()->json([
+            'status' => true,
+            'errors' => null,
+            'message' => '',
+            'data' => $response['data'],
+        ], 200);
     }
 
     public function login(LoginUserRequest $request)
     {
         $response = $this->userService->login($request);
-        return response()->json($response['data'], 200);
+        if (!$response['status']) {
+            if (!empty($response['errors'])) {
+                $error = apiErrorResponse($response['errors']['key']);
+                return response()->json($error['body'], $error['response_code']);
+            }
+            $error = apiErrorResponse('internal_server_error');
+            return response()->json($error['body'], $error['response_code']);
+        }
+        return response()->json([
+            'status' => true,
+            'errors' => null,
+            'message' => '',
+            'data' => $response['data'],
+        ], 200);
     }
 }
