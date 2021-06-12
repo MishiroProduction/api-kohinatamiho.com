@@ -24,5 +24,14 @@ class UsersSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        DB::table('users')->insert([
+            'mail_address' => 'matsui_eriko@kohinatamiho.com',
+            'password' => Hash::make('hogehoge'),
+            'user_name' => '松井恵理子',
+            'status' => 1,
+            'role' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

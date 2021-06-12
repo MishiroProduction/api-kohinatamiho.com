@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Requests\AdminUsers;
+namespace App\Http\Requests\Users;
 
 use App\Models\AdminUser;
 use App\Http\Requests\Request as AppRequest;
