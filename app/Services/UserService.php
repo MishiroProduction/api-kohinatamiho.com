@@ -13,6 +13,12 @@ use App\Http\Requests\Users\LoginUserRequest;
 
 class UserService extends AppService implements UserServiceInterface
 {
+    /**
+     * Get User list
+     *
+     * @param IndexUserRequest $request
+     * @return array
+     */
     public function index(IndexUserRequest $request): array
     {
         $orderBy = $request->input('order_by', 'id');
@@ -33,10 +39,29 @@ class UserService extends AppService implements UserServiceInterface
         ];
     }
 
+    /**
+     * login
+     *
+     * @param LoginUserRequest $request
+     * @return array
+     */
     public function login(LoginUserRequest $request): array
     {
-        $credentials = $request->only('mail_address', 'password');
-        $credentials += [
+        $params = $request->only('mail_address', 'password');
+
+        $user = User::where(['mail_address' => $params])->first();
+        if (empty($user)) {
+            return [
+                'status' => false,
+                'errors' => [
+                    'key' => '404Notfound',
+                ]
+            ];
+        }
+
+        $credentials = [
+            'mail_address' => $params['mail_address'],
+            'password' => $params['password'],
             'status' => true,
         ];
         if (!Auth::guard('api')->attempt($credentials)) {
