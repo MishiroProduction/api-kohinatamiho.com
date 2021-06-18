@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Model as EloquentModel;
  */
 class Model extends EloquentModel
 {
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
+    public const CREATED_AT = 'created_at';
+    public const UPDATED_AT = 'updated_at';
 
     /**
      * Indicates if the model should be timestamped.
@@ -30,4 +30,17 @@ class Model extends EloquentModel
         'created_at',
         'updated_at'
     ];
+
+    protected function commonSortSetting($query, $sortable, $orderBy, $sortOrder, $defaultKey)
+    {
+        foreach ($sortable as $key => $value) {
+            if (is_int($key)) {
+                if ($value === $orderBy) {
+                    $sortOrder = (strtolower($sortOrder) != 'desc') ? 'asc' : 'desc';
+                    return $query->orderBy($orderBy, $sortOrder);
+                }
+            }
+        }
+        return $query->orderBy($defaultKey);
+    }
 }
