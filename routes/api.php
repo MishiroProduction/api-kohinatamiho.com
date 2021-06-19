@@ -17,4 +17,12 @@ use Illuminate\Http\Request;
 Route::prefix('users')->group(function() {
    Route::get('/', 'UserController@index')->middleware('auth:api')->name('users.index');
    Route::post('/login', 'UserController@login')->name('users.login');
+   Route::get('/auth', function() {
+      return response()->json([
+          'status' => true,
+          'errors' => null,
+          'message' => '',
+          'data' => [],
+      ], 200);
+   });
 });
