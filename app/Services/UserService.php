@@ -25,17 +25,19 @@ class UserService extends AppService implements UserServiceInterface
         $sortOrder = $request->input('sort', 'asc');
         if ($request->has('page')) {
             $perPage = $request->input('per_page', 10);
-            $members = User::select('*')
+            $users = User::select('*')
                 ->sortSetting($orderBy, $sortOrder)
                 ->paginate($perPage);
         } else {
-            $members = User::select('*')
+            $users = User::select('*')
                 ->sortSetting($orderBy, $sortOrder)
                 ->get();
+
+
         }
         return [
             'status' => true,
-            'data' => $members,
+            'data' => $users,
         ];
     }
 
