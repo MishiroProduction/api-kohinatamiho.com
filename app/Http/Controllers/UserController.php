@@ -15,7 +15,6 @@ class UserController extends AppController
 
     public function __construct(UserServiceInterface $userService)
     {
-        parent::__construct();
         $this->userService = $userService;
     }
 
