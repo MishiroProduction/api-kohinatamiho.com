@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+
 abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication;
@@ -13,10 +15,10 @@ abstract class TestCase extends BaseTestCase
     public function createValidUserAccount(): User
     {
         $params = [
-            'mail_address' => genRandStr(200) . '@test.test',
-            'password' => 'password',
+            'mail_address' => genRandStr(100) . '@test.test',
+            'password' => Hash::make('password'),
             'user_name' => 'user_name',
-            'status' => rand(true, false),
+            'status' => true,
             'role' => rand(0, 2),
         ];
 
