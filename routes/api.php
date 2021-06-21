@@ -24,5 +24,5 @@ Route::prefix('users')->group(function() {
           'message' => '',
           'data' => [],
       ], 200);
-   });
+   })->name('users.auth');
 });

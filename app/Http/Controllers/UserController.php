@@ -18,6 +18,12 @@ class UserController extends AppController
         $this->userService = $userService;
     }
 
+    /**
+     * Get User List
+     *
+     * @param IndexUserRequest $request
+     * @return mixed
+     */
     public function index(IndexUserRequest $request)
     {
         $response = $this->userService->index($request);
@@ -37,6 +43,12 @@ class UserController extends AppController
         ], 200);
     }
 
+    /**
+     * Login
+     *
+     * @param LoginUserRequest $request
+     * @return mixed
+     */
     public function login(LoginUserRequest $request)
     {
         $response = $this->userService->login($request);

@@ -47,3 +47,17 @@ if (! function_exists('apiErrorResponse')) {
         return $ret;
     }
 }
+
+if (! function_exists('genRandStr')) {
+    function genRandStr(
+        $length,
+        $charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    ) {
+        $randMax =  strlen($charSet) - 1;
+        $retStr = '';
+        for ($i = 0; $i < $length; ++$i) {
+            $retStr .= $charSet[rand(0, $randMax)];
+        }
+        return $retStr;
+    }
+}
