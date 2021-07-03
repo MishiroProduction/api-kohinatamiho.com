@@ -48,5 +48,35 @@ class AppServiceProvider extends ServiceProvider
             $this->dateTime('created_at', $precision)->nullable()->comment('作成日時');
             $this->dateTime('updated_at', $precision)->nullable()->comment('更新日時');
         });
+        // Query Builder
+        Builder::macro('whereLike', function (string $attribute, string $term, int $position = 0) {
+            // $position =  0, mean search the partial, for example: %{term}%
+            // $position =  1, mean search the beginning, for example: {term}%
+            // $position = -1, mean search the ending, for example: %{term}
+
+            $term = addcslashes($term, '\_%');
+
+            $condition = [
+                    1  => $term . '%',
+                    -1 => '%' . $term,
+                ][$position] ?? '%' . $term . '%';
+
+            return $this->where($attribute, 'LIKE', $condition);
+        });
+
+        Builder::macro('orWhereLike', function (string $attribute, string $term, int $position = 0) {
+            // $position =  0, mean search the partial, for example: %{term}%
+            // $position =  1, mean search the beginning, for example: %{term}
+            // $position = -1, mean search the ending, for example: {term}%
+
+            $term = addcslashes($term, '\_%');
+
+            $condition = [
+                    1  => $term . '%',
+                    -1 => '%' . $term,
+                ][$position] ?? '%' . $term . '%';
+
+            return $this->orWhere($attribute, 'LIKE', $condition);
+        });
     }
 }

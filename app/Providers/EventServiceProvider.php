@@ -31,11 +31,36 @@ class EventServiceProvider extends ServiceProvider
         if ($this->app->environment("local")) {
             \DB::listen(
                 function ($query) {
-                    \Log::info($query->sql . PHP_EOL);
-                    \Log::info(json_encode($query->bindings) . PHP_EOL);
-                    \Log::info("time(ms):{$query->time}" . PHP_EOL);
+                    $route = 'no_url';
+                    if (method_exists(\Request::route(), 'getName')) {
+                        $route = \Request::route()->getName();
+                    }
+                    \Log::channel('sql')->info('[ROUTE]' . $route);
+                    \Log::channel('sql')->info('[QUERY]' . $this->mergeSqlBindings($query->sql, $query->bindings) . PHP_EOL);
+                    \Log::channel('sql')->info('[TIME]' . "time(ms):{$query->time}" . PHP_EOL);
                 }
             );
         }
+    }
+
+    private function mergeSqlBindings($sql, $bindings)
+    {
+        foreach ($bindings as $binding) {
+            if (is_string($binding)) {
+                $binding = "'{$binding}'";
+            } elseif (is_bool($binding)) {
+                $binding = $binding ? '1' : '0';
+            } elseif (is_int($binding)) {
+                $binding = (string) $binding;
+            } elseif ($binding === null) {
+                $binding = 'NULL';
+            } elseif ($binding instanceof Carbon) {
+                $binding = "'{$binding->toDateTimeString()}'";
+            } elseif ($binding instanceof DateTime) {
+                $binding = "'{$binding->format('Y-m-d H:i:s')}'";
+            }
+            $sql = preg_replace('/\\?/', $binding, $sql, 1);
+        }
+        return $sql;
     }
 }
