@@ -18,7 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('mail_address')->unique('UNQ_MAIL_ADDRESS')->comment('メールアドレス');
             $table->string('password')->comment('パスワード');
             $table->string('user_name')->comment('名前');
-            $table->boolean('status')->unsigned()->default(1)->comment('削除フラグ');
+            $table->boolean('status')->unsigned()->default(1)->comment('ステータス');
             $table->boolean('role')->unsigned()->default(0)->comment('役職');
             $table->dateTimes();
         });
