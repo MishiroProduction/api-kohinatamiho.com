@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Http\Requests\Users\CreateUserRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use App\Services\Interfaces\UserServiceInterface;
 use App\Models\User;
 use App\Services\Service as AppService;
@@ -64,7 +67,7 @@ class UserService extends AppService implements UserServiceInterface
         $credentials = [
             'mail_address' => $params['mail_address'],
             'password' => $params['password'],
-            'status' => true,
+            'status' => User::STATUS_VALID,
         ];
         if (!Auth::guard('api')->attempt($credentials)) {
             return [
@@ -87,5 +90,66 @@ class UserService extends AppService implements UserServiceInterface
                 'access_token' => $accessToken,
             ],
         ];
+    }
+
+    /**
+     * User create
+     *
+     * @param CreateUserRequest $request
+     * @return array
+     */
+    public function create(CreateUserRequest $request): array
+    {
+        $params = $request->only('mail_address', 'password', 'user_name', 'status', 'role');
+
+        /* 1.メールアドレス重複チェック */
+        $user = User::where(['mail_address' => $params])->where('status', '!=', User::STATUS_INVALID)->first();
+        if (!empty($user)) {
+            return [
+                'status' => false,
+                'errors' => [
+                    'key' => 'duplicate_entry',
+                ]
+            ];
+        }
+
+        /* 2.トランザクション開始 */
+        DB::beginTransaction();
+        try {
+            $insertData = [
+                'mail_address' => $params['mail_address'],
+                'password' => Hash::make($params['password']),
+                'user_name' => $params['user_name'],
+                'status' => $params['status'],
+                'role' => $params['role'],
+            ];
+
+            /* 3.ユーザー情報登録 */
+            $user = User::create($insertData);
+
+            /* 4.コミット */
+            DB::commit();
+            return [
+                'status' => true,
+                'data' => [
+                    'id' => $user['id'],
+                    'mail_address' => $user['mail_address'],
+                    'user_name' => $user['user_name'],
+                    'status' => $user['status'],
+                    'role' => $user['role'],
+                    'created_at' => $user['created_at'],
+                    'updated_at' => $user['updated_at'],
+                ],
+            ];
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage());
+            DB::rollBack();
+            return [
+                'status' => false,
+                'errors' => [
+                    'key' => 'internal_server_error',
+                ],
+            ];
+        }
     }
 }

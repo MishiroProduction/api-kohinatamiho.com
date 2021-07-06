@@ -17,8 +17,8 @@ class User extends Authenticatable implements JWTSubject
     public const ROLE_ADMIN = 2;
     public const ROLE_WRITER = 3;
 
-    public const STATUS_INVALID = 0;
-    public const STATUS_VALID = 1;
+    public const STATUS_INVALID = false;
+    public const STATUS_VALID = true;
 
     protected $table = 'users';
 

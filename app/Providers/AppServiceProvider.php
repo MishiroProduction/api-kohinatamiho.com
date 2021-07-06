@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Eloquent\Builder;
 use App\Services\Interfaces;
 use App\Services;
 
