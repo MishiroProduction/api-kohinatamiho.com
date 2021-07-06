@@ -19,7 +19,7 @@ abstract class TestCase extends BaseTestCase
             'password' => Hash::make('password'),
             'user_name' => 'user_name',
             'status' => true,
-            'role' => rand(0, 2),
+            'role' => User::ROLE_SYSTEM,
         ];
 
         return User::create($params);

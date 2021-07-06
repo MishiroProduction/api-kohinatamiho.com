@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 
 Route::prefix('users')->group(function() {
    Route::get('/', 'UserController@index')->middleware('auth:api')->name('users.index');
+   Route::post('/create', 'UserController@create')->middleware('auth:api')->name('users.create');
    Route::post('/login', 'UserController@login')->name('users.login');
    Route::get('/auth', function() {
       return response()->json([
@@ -24,5 +25,5 @@ Route::prefix('users')->group(function() {
           'message' => '',
           'data' => [],
       ], 200);
-   })->name('users.auth');
+   })->middleware('auth:api')->name('users.auth');
 });

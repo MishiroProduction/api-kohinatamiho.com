@@ -19,8 +19,8 @@ class UsersSeeder extends Seeder
             'mail_address' => 'takada_yuki@kohinatamiho.com',
             'password' => Hash::make('hogehoge'),
             'user_name' => '高田憂希',
-            'status' => 1,
-            'role' => 0,
+            'status' => true,
+            'role' => 1,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -28,8 +28,8 @@ class UsersSeeder extends Seeder
             'mail_address' => 'matsui_eriko@kohinatamiho.com',
             'password' => Hash::make('hogehoge'),
             'user_name' => '松井恵理子',
-            'status' => 1,
-            'role' => 0,
+            'status' => true,
+            'role' => 2,
             'created_at' => now(),
             'updated_at' => now(),
         ]);

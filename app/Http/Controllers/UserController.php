@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller as AppController;
 use App\Services\Interfaces\UserServiceInterface;
 use App\Http\Requests\Users\IndexUserRequest;
 use App\Http\Requests\Users\LoginUserRequest;
+use App\Http\Requests\Users\CreateUserRequest;
 
 class UserController extends AppController
 {
@@ -52,6 +53,31 @@ class UserController extends AppController
     public function login(LoginUserRequest $request)
     {
         $response = $this->userService->login($request);
+        if (!$response['status']) {
+            if (!empty($response['errors'])) {
+                $error = apiErrorResponse($response['errors']['key']);
+                return response()->json($error['body'], $error['response_code']);
+            }
+            $error = apiErrorResponse('internal_server_error');
+            return response()->json($error['body'], $error['response_code']);
+        }
+        return response()->json([
+            'status' => true,
+            'errors' => null,
+            'message' => '',
+            'data' => $response['data'],
+        ], 200);
+    }
+
+    /**
+     * Create
+     *
+     * @param CreateUserRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function create(CreateUserRequest $request)
+    {
+        $response = $this->userService->create($request);
         if (!$response['status']) {
             if (!empty($response['errors'])) {
                 $error = apiErrorResponse($response['errors']['key']);
